@@ -21,7 +21,7 @@ impl CropBundle {
     }
 }
 
-#[derive(Component, Debug, Default)]
+#[derive(Component, Debug, Default, Clone)]
 pub struct CropData {
     pub stages: Vec<CropStage>,
     pub index: usize,

@@ -9,7 +9,10 @@ use bevy_hanabi::{
 };
 use ron::ser::PrettyConfig;
 
-use crate::{common_events::CropStageChange, data::game_asset_path::GameAssetPath, vfx::RetainVfx};
+use crate::{
+    common_events::CropStageChange,
+    data::{game_asset_path::GameAssetPath, named_asset_id::NamedAssets},
+};
 
 use super::{SpawnVfx, VfxAsset};
 
@@ -25,8 +28,8 @@ impl Plugin for CropVfx {
 const VFX_CROP_STAGE_CHANGE: &'static str = "vfx_crop_stage_change";
 
 fn init_vfx(
+    mut cmd: Commands, mut names: ResMut<NamedAssets<VfxAsset>>,
     mut effects: ResMut<Assets<EffectAsset>>, mut containers: ResMut<Assets<VfxAsset>>,
-    mut cmd: Commands,
 ) {
     let mut module = Module::default();
     let init_pos = SetPositionSphereModifier {
@@ -40,7 +43,7 @@ fn init_vfx(
         axis: module.lit(Vec3::Y),
         speed: module.lit(0.2),
     };
-    let lifetime = SetAttributeModifier::new(Attribute::LIFETIME, module.lit(1.5));
+    let lifetime = SetAttributeModifier::new(Attribute::LIFETIME, module.lit(3.));
 
     let accel = AccelModifier::new(module.lit(Vec3::Y * 0.3));
 
@@ -73,30 +76,26 @@ fn init_vfx(
             mode: OrientMode::FaceCameraPosition,
             rotation: None,
         })
-        .render(SizeOverLifetimeModifier {
-            gradient: size,
-            screen_space_size: false,
-        })
+        // .render(SizeOverLifetimeModifier {
+        //     gradient: size,
+        //     screen_space_size: false,
+        // })
         .render(round);
-    match File::create(GameAssetPath::new_data("::vfx/crop_change.ron").path_relative()) {
-        Ok(file) => match ron::ser::to_writer_pretty(file, &effect, PrettyConfig::default()) {
-            Ok(_) => info!("Emitted vfx ron file"),
-            Err(err) => warn!("Not able to serialize hanabi VFX, reason: {}", err),
-        },
-        Err(err) => warn!("File error: {}", err),
-    }
-    let handle = effects.add(effect);
-    cmd.trigger(RetainVfx(containers.add(VfxAsset::from_asset(
+
+    names.register(
         VFX_CROP_STAGE_CHANGE,
-        handle,
-        Duration::from_secs_f32(2.0),
-    ))));
+        containers.add(VfxAsset::from_asset(
+            VFX_CROP_STAGE_CHANGE,
+            effects.add(effect),
+            Duration::from_secs_f32(3.5),
+        )),
+    );
 }
 
 fn spawn_vfx(trigger: Trigger<CropStageChange>, mut cmd: Commands) {
-    info!("Dispatching vfx spawn event");
+    // info!("Dispatching vfx spawn event");
     cmd.trigger(SpawnVfx {
         id: VFX_CROP_STAGE_CHANGE.into(),
-        transform: Transform::from_translation(trigger.event().position + (Vec3::Y * 0.5)),
+        transform: Transform::from_translation(trigger.event().position),
     });
 }

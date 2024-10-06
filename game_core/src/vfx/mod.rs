@@ -4,6 +4,8 @@ use bevy::prelude::*;
 use bevy_hanabi::{EffectAsset, ParticleEffect, ParticleEffectBundle};
 use crop_vfx::CropVfx;
 
+use crate::data::named_asset_id::NamedAssets;
+
 pub struct VfxPlugin;
 pub mod crop_vfx;
 
@@ -11,15 +13,11 @@ impl Plugin for VfxPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(CropVfx);
         app.init_asset::<VfxAsset>();
-        app.init_resource::<VfxRetainer>();
+        app.init_resource::<NamedAssets<VfxAsset>>();
         app.add_systems(Update, despawn_vfx);
-        app.observe(retain_asset);
         app.observe(spawn_vfx);
     }
 }
-
-#[derive(Event)]
-struct RetainVfx(Handle<VfxAsset>);
 
 #[derive(Event, Debug)]
 struct SpawnVfx {
@@ -30,10 +28,7 @@ struct SpawnVfx {
 #[derive(Component)]
 pub struct VfxOneshot(Timer);
 
-#[derive(Resource, Default)]
-struct VfxRetainer(Vec<Handle<VfxAsset>>);
-
-#[derive(Asset, Reflect, Clone, Debug)]
+#[derive(Asset, Reflect, Clone, Debug, Default)]
 pub struct VfxAsset {
     id: String,
     effect: Handle<EffectAsset>,
@@ -62,28 +57,21 @@ fn despawn_vfx(mut query: Query<(&mut VfxOneshot, Entity)>, time: Res<Time>, mut
     }
 }
 
-fn retain_asset(trigger: Trigger<RetainVfx>, mut retainer: ResMut<VfxRetainer>) {
-    retainer.0.push(trigger.event().0.clone());
-}
-
-fn spawn_vfx(trigger: Trigger<SpawnVfx>, mut cmd: Commands, effects: Res<Assets<VfxAsset>>) {
-    info!("Received vfx spawn event : {:#?}", trigger.event());
+fn spawn_vfx(
+    trigger: Trigger<SpawnVfx>, mut cmd: Commands, names: Res<NamedAssets<VfxAsset>>,
+    effects: Res<Assets<VfxAsset>>,
+) {
+    // info!("Received vfx spawn event : {:#?}", trigger.event());
 
     let SpawnVfx { id, transform } = trigger.event();
-    let Some(vfx) = effects
-        .iter()
-        .filter(|a| a.1.id == id.clone())
-        .map(|a| a.1)
-        .next()
-    else {
-        error!(
-            "Failed to find VFX data for {} (from {} available assets)",
-            id,
-            effects.len()
-        );
+    let Some(vfx) = names.get(id) else {
+        error!("Failed to find VFX data for {} (from available assets)", id);
         return;
     };
-    info!("Spawning VFX: {}", vfx.id);
+    let Some(vfx) = effects.get(vfx.id()) else {
+        return;
+    };
+    // info!("Spawning VFX: {}", vfx.id);
     let mut e = cmd.spawn((
         Name::new(format!("VFX {} instance", vfx.id)),
         ParticleEffectBundle {

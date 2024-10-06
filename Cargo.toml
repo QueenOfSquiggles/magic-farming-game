@@ -1,5 +1,5 @@
 [workspace]
-members = ["game_core"]
+members = [ "editor_crops","game_core"]
 resolver = "2"
 
 [package]

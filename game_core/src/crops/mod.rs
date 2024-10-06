@@ -5,9 +5,9 @@ use systems::add_test_crop;
 use systems::initialize_crops;
 use systems::update_crops;
 
-mod components;
-mod data;
-mod systems;
+pub mod components;
+pub mod data;
+pub mod systems;
 pub struct CropsPlugin;
 
 impl Plugin for CropsPlugin {
