@@ -8,3 +8,4 @@ iced = "0.13.1"
 game_core = { path = "../game_core" }
 serde = "1.0.210"
 ron = "0.8.1"
+rfd = "0.15.0"
