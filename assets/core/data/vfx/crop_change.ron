@@ -1,0 +1,147 @@
+(
+    name: "Crop Stage Change VFX",
+    capacities: [
+        51,
+    ],
+    spawner: (
+        num_particles: Single(50.0),
+        spawn_time: Single(0.0),
+        period: Single(inf),
+        starts_active: true,
+        starts_immediately: true,
+    ),
+    z_layer_2d: 0.0,
+    simulation_space: Global,
+    simulation_condition: WhenVisible,
+    init_modifiers: [
+        (
+            modifier: {
+                "SetPositionSphereModifier": (
+                    center: 1,
+                    radius: 2,
+                    dimension: Volume,
+                ),
+            },
+            groups: (1),
+        ),
+        (
+            modifier: {
+                "SetVelocityTangentModifier": (
+                    origin: 3,
+                    axis: 4,
+                    speed: 5,
+                ),
+            },
+            groups: (1),
+        ),
+        (
+            modifier: {
+                "SetAttributeModifier": (
+                    attribute: "lifetime",
+                    value: 6,
+                ),
+            },
+            groups: (1),
+        ),
+    ],
+    update_modifiers: [
+        (
+            modifier: {
+                "AccelModifier": (
+                    accel: 7,
+                ),
+            },
+            groups: (4294967295),
+        ),
+        (
+            modifier: {
+                "LinearDragModifier": (
+                    drag: 9,
+                ),
+            },
+            groups: (4294967295),
+        ),
+    ],
+    render_modifiers: [
+        (
+            modifier: {
+                "ColorOverLifetimeModifier": (
+                    gradient: (
+                        keys: [
+                            (
+                                ratio: 0.0,
+                                value: (0.0, 1.0, 0.0, 1.0),
+                            ),
+                            (
+                                ratio: 1.0,
+                                value: (1.0, 1.0, 1.0, 1.0),
+                            ),
+                        ],
+                    ),
+                ),
+            },
+            groups: (4294967295),
+        ),
+        (
+            modifier: {
+                "OrientModifier": (
+                    mode: FaceCameraPosition,
+                    rotation: None,
+                ),
+            },
+            groups: (4294967295),
+        ),
+        (
+            modifier: {
+                "SizeOverLifetimeModifier": (
+                    gradient: (
+                        keys: [
+                            (
+                                ratio: 0.0,
+                                value: (0.0, 0.0),
+                            ),
+                            (
+                                ratio: 0.1,
+                                value: (2.0, 2.0),
+                            ),
+                            (
+                                ratio: 0.8,
+                                value: (1.0, 1.0),
+                            ),
+                            (
+                                ratio: 1.0,
+                                value: (0.0, 0.0),
+                            ),
+                        ],
+                    ),
+                    screen_space_size: false,
+                ),
+            },
+            groups: (4294967295),
+        ),
+        (
+            modifier: {
+                "RoundModifier": (
+                    roundness: 8,
+                ),
+            },
+            groups: (4294967295),
+        ),
+    ],
+    motion_integration: PostUpdate,
+    module: (
+        expressions: [
+            Literal(Vector(Vec3((0.0, 0.0, 0.0)))),
+            Literal(Scalar(Float(0.05))),
+            Literal(Vector(Vec3((0.0, 0.0, 0.0)))),
+            Literal(Vector(Vec3((0.0, 1.0, 0.0)))),
+            Literal(Scalar(Float(0.2))),
+            Literal(Scalar(Float(1.5))),
+            Literal(Vector(Vec3((0.0, 0.3, 0.0)))),
+            Literal(Scalar(Float(1.0))),
+            Literal(Scalar(Float(2.0))),
+        ],
+        properties: [],
+    ),
+    alpha_mode: Blend,
+)

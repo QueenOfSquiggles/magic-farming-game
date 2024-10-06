@@ -1,0 +1,5 @@
+[workspace]
+
+members = ["app", "game_core"]
+default-members = ["app"]
+resolver = "2"

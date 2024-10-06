@@ -1,0 +1,37 @@
+#![enable(implicit_some)]
+#![enable(unwrap_newtypes)]
+#![enable(unwrap_variant_newtypes)]
+(
+  id: "Example",
+  stages: [(
+    model: "::crate-color.glb",
+    duration: (
+      min: 1,
+      max: 2,
+    ),
+    begin_status: Growing,
+  ), (
+    model: "::crate-color.glb",
+    duration: (
+      min: 1,
+      max: 2,
+    ),
+    begin_status: None,
+  ), (
+    model: "::crate-color.glb",
+    duration: (
+      min: 1,
+      max: 2,
+    ),
+    begin_status: Fruiting(
+      model: "::crate-color.glb",
+      drops: [(
+        item: "test",
+        amount: (
+          min: 1,
+          max: 3,
+        ),
+      )],
+    ),
+  )],
+)

@@ -1,0 +1,6 @@
+reorder_impl_items = true
+wrap_comments = true
+condense_wildcard_suffixes = true
+enum_discrim_align_threshold = 20
+fn_params_layout = "Compressed"
+force_multiline_blocks = true

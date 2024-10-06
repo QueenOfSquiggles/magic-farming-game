@@ -1,0 +1,34 @@
+#![enable(implicit_some)]
+(
+id: "Corn",
+stages: [
+    (
+        model: "::Crops/crops_cornStageA.glb",
+        duration: (min: 1, max: 2),
+        begin_status: Growing
+    ),
+    (
+        model: "::Crops/crops_cornStageB.glb",
+        duration: (min: 1, max: 2),
+        begin_status: None
+    ),
+    (
+        model: "::Crops/crops_cornStageC.glb",
+        duration: (min: 1, max: 2),
+        begin_status: None
+    ),
+    (
+        model: "::Crops/crops_cornStageC.glb",
+        duration: (min: 3, max: 6),
+        begin_status: Fruiting (
+            model: "::Crops/crops_cornStageD.glb",
+            drops: [
+                (
+                    item: ("corn"),
+                    amount: (min: 3, max: 7)
+                )
+            ]
+        )
+    ),   
+]
+)

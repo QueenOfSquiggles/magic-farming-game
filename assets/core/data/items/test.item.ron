@@ -1,0 +1,5 @@
+(
+    id: ItemId( "test_item" ),
+    icon: "::Debug/Orange/texture_01.png",
+    model: Some("::crate-color.glb"),
+)
