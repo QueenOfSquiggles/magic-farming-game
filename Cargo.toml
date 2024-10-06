@@ -1,5 +1,27 @@
 [workspace]
-
-members = ["app", "game_core"]
-default-members = ["app"]
+members = ["game_core"]
 resolver = "2"
+
+[package]
+name = "magic_farm_game"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+game_core = { path = "game_core" }
+bevy = "0.14"
+
+[profile.dev]
+opt-level = 1
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.release]
+codegen-units = 1
+lto = "thin"
+
+[profile.wasm-release]
+inherits = "release"
+opt-level = "z"
+strip = "debuginfo"

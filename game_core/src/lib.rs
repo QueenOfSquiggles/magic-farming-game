@@ -29,6 +29,7 @@ use mouse::MousePlugin;
 use player::PlayerPlugin;
 use settings::GameSettingsPlugin;
 use vfx::VfxPlugin;
+
 pub type Random = GlobalEntropy<WyRand>;
 
 pub mod collision;
@@ -49,15 +50,14 @@ pub mod vfx;
 pub struct GamePlugins;
 
 impl GamePlugins {
-    pub fn run_app() {
-        App::new().add_plugins(GamePlugins).run();
+    pub fn run_app() -> AppExit {
+        App::new().add_plugins(GamePlugins).run()
     }
 }
 
 impl Plugin for GamePlugins {
-    fn build(app: &mut App) {
+    fn build(&self, app: &mut App) {
         let args = env::args().collect::<Vec<String>>();
-        let mut app = App::new();
         app.add_plugins(
             DefaultPlugins
                 .set(LogPlugin {
@@ -122,9 +122,6 @@ impl Plugin for GamePlugins {
             // only do this in development (when debug assertions are available)
             app.add_systems(Update, exit_on_f8);
         }
-
-        // Run App
-        app.run()
     }
 }
 

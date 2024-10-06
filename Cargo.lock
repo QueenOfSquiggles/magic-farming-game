@@ -179,13 +179,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "86fdf8605db99b54d3cd748a44c6d04df638eb5dafb219b135d0149bd0db01f6"
 
 [[package]]
-name = "app"
-version = "0.1.0"
-dependencies = [
- "game_core",
-]
-
-[[package]]
 name = "app_dirs2"
 version = "2.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2880,6 +2873,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19b955cdeb2a02b9117f121ce63aa52d08ade45de53e48fe6a38b39c10f6f709"
 dependencies = [
  "libc",
+]
+
+[[package]]
+name = "magic_farm_game"
+version = "0.1.0"
+dependencies = [
+ "bevy",
+ "game_core",
 ]
 
 [[package]]
