@@ -20,21 +20,30 @@ impl Plugin for InteractionPlugin {
 pub struct Interactable;
 
 fn create_interactables(mut cmd: Commands, assets: Res<AssetServer>) {
+    let scene = assets.load(GameAssetPath::new_model("::crate-color.glb").gltf_scene());
+
+    spawn_interactable_crate(&mut cmd, scene.clone(), Vec3::new(-2., 10., 0.), "Crate A");
+    spawn_interactable_crate(&mut cmd, scene.clone(), Vec3::new(0., 10., 2.), "Crate B");
+    spawn_interactable_crate(&mut cmd, scene.clone(), Vec3::new(-2., 10., 2.), "Crate C");
+    spawn_interactable_crate(&mut cmd, scene.clone(), Vec3::new(-2., 10., 2.), "Crate D");
+}
+
+fn spawn_interactable_crate(cmd: &mut Commands, scene: Handle<Scene>, position: Vec3, name: &str) {
     cmd.spawn((
-        Name::new("Test Interactable Object"),
+        Name::new(name.to_string()),
         RigidBody::Dynamic,
         Interactable,
         CollisionLayers::new(
             [GameLayers::Default, GameLayers::Interactable],
             LayerMask::ALL,
         ),
-        ColliderConstructorHierarchy::new(ColliderConstructor::ConvexDecompositionFromMesh),
+        ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh)
+            .with_default_density(0.2),
         SceneBundle {
-            scene: assets.load(GameAssetPath::new_model("::crate-color.glb").gltf_scene()),
-            transform: Transform::from_xyz(2., 3., 0.).with_scale(Vec3::ONE * 5.),
+            scene,
+            transform: Transform::from_translation(position).with_scale(Vec3::ONE * 2.),
             ..default()
         },
-        MassPropertiesBundle::new_computed(&Collider::cuboid(5., 5., 5.), 5.0),
     ))
     .observe(handle_interact);
 }

@@ -2,15 +2,15 @@ use std::fs::File;
 
 use avian3d::prelude::{
     Collider, ColliderConstructor, ColliderConstructorHierarchy, ColliderDensity, RigidBody,
-    VhacdParameters,
 };
-use bevy::{ecs::system::EntityCommands, prelude::*, scene::SceneInstance};
+use bevy::{ecs::system::EntityCommands, prelude::*};
 use bevy_rand::prelude::{GlobalEntropy, WyRand};
 use ron::{extensions::Extensions, ser::PrettyConfig};
 
 use crate::{
     common_events::{CropStageChange, NewDay},
     data::{game_asset_path::GameAssetPath, range::Range},
+    interaction::Interactable,
     items::{drops::ItemDrop, ItemId},
 };
 
@@ -112,10 +112,12 @@ pub fn initialize_crops(
         let scene = assets.load::<Scene>(GameAssetPath::new_model(start.model).gltf_scene());
 
         cmd.entity(entity).insert((
+            Name::new(format!("Crop {}", data.id)),
             start.begin_status.unwrap_or_default(),
             CropTimer(start.duration.get(&mut rng)),
             scene,
             RigidBody::Static,
+            Interactable,
             ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh),
         ));
     }

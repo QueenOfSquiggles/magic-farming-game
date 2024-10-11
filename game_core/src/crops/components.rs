@@ -23,6 +23,7 @@ impl CropBundle {
 
 #[derive(Component, Debug, Default, Clone)]
 pub struct CropData {
+    pub id: String,
     pub stages: Vec<CropStage>,
     pub index: usize,
 }
@@ -30,6 +31,7 @@ pub struct CropData {
 impl CropData {
     pub fn new(stages: impl IntoIterator<Item = CropStage>) -> Self {
         Self {
+            id: "".into(),
             stages: stages.into_iter().collect::<Vec<_>>(),
             index: 0,
         }

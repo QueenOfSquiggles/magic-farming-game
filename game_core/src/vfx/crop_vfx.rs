@@ -1,4 +1,4 @@
-use std::{fs::File, time::Duration};
+use std::time::Duration;
 
 use bevy::prelude::*;
 use bevy_hanabi::{
@@ -7,12 +7,8 @@ use bevy_hanabi::{
     SetPositionSphereModifier, SetVelocityTangentModifier, ShapeDimension,
     SizeOverLifetimeModifier, Spawner,
 };
-use ron::ser::PrettyConfig;
 
-use crate::{
-    common_events::CropStageChange,
-    data::{game_asset_path::GameAssetPath, named_asset_id::NamedAssets},
-};
+use crate::{common_events::CropStageChange, data::named_asset_id::NamedAssets};
 
 use super::{SpawnVfx, VfxAsset};
 
@@ -28,8 +24,8 @@ impl Plugin for CropVfx {
 const VFX_CROP_STAGE_CHANGE: &'static str = "vfx_crop_stage_change";
 
 fn init_vfx(
-    mut cmd: Commands, mut names: ResMut<NamedAssets<VfxAsset>>,
-    mut effects: ResMut<Assets<EffectAsset>>, mut containers: ResMut<Assets<VfxAsset>>,
+    mut names: ResMut<NamedAssets<VfxAsset>>, mut effects: ResMut<Assets<EffectAsset>>,
+    mut containers: ResMut<Assets<VfxAsset>>,
 ) {
     let mut module = Module::default();
     let init_pos = SetPositionSphereModifier {

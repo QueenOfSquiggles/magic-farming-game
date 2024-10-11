@@ -2,8 +2,10 @@ use std::env;
 
 use avian3d::{prelude::PhysicsDebugPlugin, PhysicsPlugins};
 use bevy::{
+    core_pipeline::experimental::taa::TemporalAntiAliasBundle,
     input::common_conditions::input_toggle_active,
     log::{Level, LogPlugin},
+    pbr::ScreenSpaceAmbientOcclusionBundle,
     prelude::*,
     window::PresentMode,
 };
@@ -46,6 +48,7 @@ pub mod mouse;
 pub mod player;
 pub mod settings;
 pub mod vfx;
+pub mod dev_assertions;
 
 pub struct GamePlugins;
 
@@ -90,7 +93,7 @@ impl Plugin for GamePlugins {
             color: Color::srgb(0.1, 0.1, 0.1),
             brightness: 100.0,
         });
-        app.insert_resource(Msaa::Sample4);
+        app.insert_resource(Msaa::Off);
         // Third Party
         app.add_plugins(PhysicsPlugins::default());
         if cfg!(debug_assertions) && false {

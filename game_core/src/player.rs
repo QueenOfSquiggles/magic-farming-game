@@ -1,5 +1,8 @@
 use avian3d::prelude::*;
-use bevy::prelude::*;
+use bevy::{
+    core_pipeline::experimental::taa::TemporalAntiAliasBundle,
+    pbr::ScreenSpaceAmbientOcclusionBundle, prelude::*,
+};
 use bevy_tnua::prelude::{
     TnuaBuiltinJump, TnuaBuiltinWalk, TnuaController, TnuaControllerBundle, TnuaControllerPlugin,
 };
@@ -106,19 +109,22 @@ fn create_player(mut cmd: Commands, mut meshes: ResMut<Assets<Mesh>>) {
             },
         ))
         .with_children(|builder| {
-            builder.spawn((
-                Name::new("PlayerCamera"),
-                FpsCameraMarker,
-                Camera3dBundle {
-                    projection: Projection::Perspective(PerspectiveProjection {
-                        fov: 70.,
-                        far: 300.,
+            builder
+                .spawn((
+                    Name::new("PlayerCamera"),
+                    FpsCameraMarker,
+                    Camera3dBundle {
+                        projection: Projection::Perspective(PerspectiveProjection {
+                            fov: 70.,
+                            far: 300.,
+                            ..default()
+                        }),
+                        transform: Transform::from_xyz(0.0, 0.0, 7.),
                         ..default()
-                    }),
-                    transform: Transform::from_xyz(0.0, 0.0, 7.),
-                    ..default()
-                },
-            ));
+                    },
+                ))
+                .insert(ScreenSpaceAmbientOcclusionBundle::default())
+                .insert(TemporalAntiAliasBundle::default());
         });
     });
 }
