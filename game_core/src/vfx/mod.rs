@@ -71,7 +71,7 @@ fn spawn_vfx(
     let Some(vfx) = effects.get(vfx.id()) else {
         return;
     };
-    // info!("Spawning VFX: {}", vfx.id);
+    info!("Spawning VFX: {} at {}", vfx.id, transform.translation());
     let mut e = cmd.spawn((
         Name::new(format!("VFX {} instance", vfx.id)),
         ParticleEffectBundle {

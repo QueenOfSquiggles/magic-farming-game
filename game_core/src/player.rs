@@ -7,7 +7,7 @@ use bevy_tnua_avian3d::{TnuaAvian3dPlugin, TnuaAvian3dSensorShape};
 use leafwing_input_manager::{
     plugin::InputManagerPlugin,
     prelude::{
-        ActionState, GamepadStick, GamepadVirtualAxis, InputMap, KeyboardVirtualDPad, MouseMove,
+        ActionState, GamepadStick, InputMap, KeyboardVirtualDPad, MouseMove,
         WithDualAxisProcessingPipelineExt,
     },
     Actionlike, InputControlKind, InputManagerBundle,
