@@ -1,9 +1,10 @@
 use std::fs::File;
 
 use avian3d::prelude::{
-    Collider, ColliderConstructor, ColliderConstructorHierarchy, VhacdParameters,
+    Collider, ColliderConstructor, ColliderConstructorHierarchy, ColliderDensity, RigidBody,
+    VhacdParameters,
 };
-use bevy::prelude::*;
+use bevy::{ecs::system::EntityCommands, prelude::*, scene::SceneInstance};
 use bevy_rand::prelude::{GlobalEntropy, WyRand};
 use ron::{extensions::Extensions, ser::PrettyConfig};
 
@@ -90,30 +91,32 @@ fn crop_from_asset(file: &str, cmd: &mut Commands, position: Vec3) {
     cmd.spawn((
         Name::new(format!("{} - {:.1},{:.1}", def.id, position.x, position.z)),
         // Todo component `cleanup::{??}`
-        Transform::from_xyz(position.x, position.y, position.z).with_scale(Vec3::ONE * 5.),
+        SpatialBundle {
+            transform: Transform::from_xyz(position.x, position.y, position.z)
+                .with_scale(Vec3::ONE * 5.),
+            ..default()
+        },
         bundle,
     ));
 }
 
 pub fn initialize_crops(
-    query: Query<(&CropData, &Transform, Entity), Without<CropTimer>>, mut cmd: Commands,
+    query: Query<(&CropData, Entity), Without<CropTimer>>, mut cmd: Commands,
     assets: Res<AssetServer>, mut rng: ResMut<GlobalEntropy<WyRand>>,
 ) {
-    for (data, trans, entity) in query.iter() {
+    for (data, entity) in query.iter() {
         let Some(start) = data.stages.first().cloned() else {
             cmd.entity(entity).despawn_recursive();
             continue;
         };
+        let scene = assets.load::<Scene>(GameAssetPath::new_model(start.model).gltf_scene());
 
-        let scene = assets.load(GameAssetPath::new_model(start.model).gltf_scene());
         cmd.entity(entity).insert((
             start.begin_status.unwrap_or_default(),
             CropTimer(start.duration.get(&mut rng)),
-            SceneBundle {
-                scene,
-                transform: trans.clone(),
-                ..default()
-            },
+            scene,
+            RigidBody::Static,
+            ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh),
         ));
     }
 }
@@ -143,9 +146,6 @@ pub fn update_crops(
             cmd.entity(entity).despawn();
             return;
         };
-        let Some(new_status) = &stage.begin_status else {
-            return;
-        };
 
         cmd.trigger(CropStageChange {
             entity,
@@ -157,11 +157,7 @@ pub fn update_crops(
             // removing colliders allows for regeneration based on the changing scene
             cmd.entity(child).remove::<Collider>();
         }
-        cmd.entity(entity).insert((
-            new_status.clone(),
-            assets.load::<Scene>(GameAssetPath::new_model(stage.model.clone()).gltf_scene()),
-            ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh),
-        ));
+        set_crop_model(&mut cmd.entity(entity), &stage.model, &assets);
 
         match last_status {
             CropStatus::Growing => (),
@@ -174,20 +170,21 @@ pub fn update_crops(
             }
         }
 
+        // Crop Status Stuff
+
+        let Some(new_status) = &stage.begin_status else {
+            return;
+        };
+        cmd.entity(entity).insert((new_status.clone(),));
+
         match new_status {
             CropStatus::Fruiting { model, drops } => {
-                cmd.entity(entity).insert((
-                    CropFruit(drops.clone()),
-                    assets.load::<Scene>(GameAssetPath::new_model(model.clone()).gltf_scene()),
-                    ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh),
-                ));
+                cmd.entity(entity).insert((CropFruit(drops.clone()),));
+                set_crop_model(&mut cmd.entity(entity), model, &assets);
             }
             CropStatus::Seeding { model, drops } => {
-                cmd.entity(entity).insert((
-                    CropFruit(drops.clone()),
-                    assets.load::<Scene>(GameAssetPath::new_model(model.clone()).gltf_scene()),
-                    ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh),
-                ));
+                cmd.entity(entity).insert((CropFruit(drops.clone()),));
+                set_crop_model(&mut cmd.entity(entity), model, &assets);
             }
             CropStatus::Dead => {
                 cmd.entity(entity).despawn();
@@ -198,4 +195,14 @@ pub fn update_crops(
             }
         }
     }
+}
+
+fn set_crop_model<S: Into<String> + Clone>(
+    entity: &mut EntityCommands, path: &S, assets: &Res<AssetServer>,
+) {
+    entity.insert((
+        assets.load::<Scene>(GameAssetPath::new_model(path.clone()).gltf_scene()),
+        ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh)
+            .with_default_density(ColliderDensity(1.0)),
+    ));
 }

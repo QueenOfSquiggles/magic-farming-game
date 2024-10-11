@@ -1311,6 +1311,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_sprite3d"
+version = "3.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "43db9607a6419cd8930155f9d40d1784bdf31eab28a536a10bc97d0ea94662e1"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_state"
 version = "0.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2791,6 +2800,7 @@ dependencies = [
  "bevy_hanabi",
  "bevy_rand",
  "bevy_screen_diagnostics",
+ "bevy_sprite3d",
  "bevy_tweening",
  "lazy_static",
  "leafwing-input-manager",

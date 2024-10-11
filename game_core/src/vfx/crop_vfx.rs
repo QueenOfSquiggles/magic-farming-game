@@ -34,24 +34,26 @@ fn init_vfx(
     let mut module = Module::default();
     let init_pos = SetPositionSphereModifier {
         center: module.lit(Vec3::ZERO),
-        radius: module.lit(0.05),
+        radius: module.lit(0.1),
         dimension: ShapeDimension::Volume,
     };
 
     let init_vel = SetVelocityTangentModifier {
         origin: module.lit(Vec3::ZERO),
         axis: module.lit(Vec3::Y),
-        speed: module.lit(0.2),
+        speed: module.lit(2.5),
     };
     let lifetime = SetAttributeModifier::new(Attribute::LIFETIME, module.lit(3.));
 
-    let accel = AccelModifier::new(module.lit(Vec3::Y * 0.3));
+    let accel = AccelModifier::new(module.lit(Vec3::Y * 2.0));
 
     let mut gradient = Gradient::new();
-    gradient.add_key(0.0, Vec4::new(0., 1., 0., 1.));
-    gradient.add_key(1.0, Vec4::new(1., 1., 1., 1.));
 
-    const PARTICLE_SIZE: f32 = 2.0;
+    gradient.add_key(0.0, Color::srgb(0.0, 1.0, 0.0).to_linear().to_vec4());
+    gradient.add_key(0.75, Color::srgb(0.0, 1.0, 0.0).to_linear().to_vec4());
+    gradient.add_key(1.0, Color::srgb(1.0, 1.0, 1.0).to_linear().to_vec4());
+
+    const PARTICLE_SIZE: f32 = 1.3;
     let mut size = Gradient::new();
     size.add_key(0.0, Vec2::ONE * 0.0 * PARTICLE_SIZE);
     size.add_key(0.1, Vec2::ONE * 1.0 * PARTICLE_SIZE);
@@ -76,10 +78,10 @@ fn init_vfx(
             mode: OrientMode::FaceCameraPosition,
             rotation: None,
         })
-        // .render(SizeOverLifetimeModifier {
-        //     gradient: size,
-        //     screen_space_size: false,
-        // })
+        .render(SizeOverLifetimeModifier {
+            gradient: size,
+            screen_space_size: false,
+        })
         .render(round);
 
     names.register(

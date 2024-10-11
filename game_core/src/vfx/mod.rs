@@ -1,17 +1,20 @@
 use std::time::Duration;
 
 use bevy::prelude::*;
-use bevy_hanabi::{EffectAsset, ParticleEffect, ParticleEffectBundle};
+use bevy_hanabi::{EffectAsset, EffectSpawner, ParticleEffect, ParticleEffectBundle};
 use crop_vfx::CropVfx;
+use interaction_selection::InteractionSelectionPlugin;
 
 use crate::data::named_asset_id::NamedAssets;
 
 pub struct VfxPlugin;
 pub mod crop_vfx;
+pub mod interaction_selection;
 
 impl Plugin for VfxPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(CropVfx);
+        app.add_plugins(InteractionSelectionPlugin);
         app.init_asset::<VfxAsset>();
         app.init_resource::<NamedAssets<VfxAsset>>();
         app.add_systems(Update, despawn_vfx);
@@ -48,10 +51,17 @@ impl VfxAsset {
     }
 }
 
-fn despawn_vfx(mut query: Query<(&mut VfxOneshot, Entity)>, time: Res<Time>, mut cmd: Commands) {
-    for (mut effect, entity) in query.iter_mut() {
-        effect.0.tick(time.delta());
-        if effect.0.just_finished() {
+fn despawn_vfx(
+    mut query: Query<(&mut VfxOneshot, &EffectSpawner, Entity)>, time: Res<Time>, mut cmd: Commands,
+) {
+    for (mut oneshot_timer, vfx, entity) in query.iter_mut() {
+        if !vfx.is_active() {
+            // only tick down effects that are emitting
+            continue;
+        }
+
+        oneshot_timer.0.tick(time.delta());
+        if oneshot_timer.0.just_finished() {
             cmd.entity(entity).despawn();
         }
     }
@@ -71,7 +81,8 @@ fn spawn_vfx(
     let Some(vfx) = effects.get(vfx.id()) else {
         return;
     };
-    info!("Spawning VFX: {} at {}", vfx.id, transform.translation());
+
+    // info!("Spawning VFX: {} at {}", vfx.id, transform.translation);
     let mut e = cmd.spawn((
         Name::new(format!("VFX {} instance", vfx.id)),
         ParticleEffectBundle {

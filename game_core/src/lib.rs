@@ -1,6 +1,6 @@
 use std::env;
 
-use avian3d::PhysicsPlugins;
+use avian3d::{prelude::PhysicsDebugPlugin, PhysicsPlugins};
 use bevy::{
     input::common_conditions::input_toggle_active,
     log::{Level, LogPlugin},
@@ -93,6 +93,9 @@ impl Plugin for GamePlugins {
         app.insert_resource(Msaa::Sample4);
         // Third Party
         app.add_plugins(PhysicsPlugins::default());
+        if cfg!(debug_assertions) && false {
+            app.add_plugins(PhysicsDebugPlugin::default());
+        }
         app.add_plugins(TweeningPlugin);
         app.add_plugins(ScreenDiagnosticsPlugin::default());
         app.add_plugins(ScreenFrameDiagnosticsPlugin);
